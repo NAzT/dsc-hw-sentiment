@@ -113,6 +113,7 @@ pos1 = ['pos'] * len(pos)
 neg1 = ['neg'] * len(negs)
 training_data = list(zip(pos, pos1)) + list(zip(negs, neg1))
 
+print(training_data)
 # print('before training')
 # vocabulary = set(chain(*[word_tokenize(i[0]) for i in training_data]))
 # print('before training')
@@ -120,7 +121,7 @@ training_data = list(zip(pos, pos1)) + list(zip(negs, neg1))
 #                training_data]
 # print('before training')
 # print("feature_set", feature_set)
-from nltk import NaiveBayesClassifier as nbc
+# from nltk import NaiveBayesClassifier as nbc
 #
 # print('start training')
 # classifier = nbc.train(feature_set)
@@ -144,10 +145,20 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 tvec = TfidfVectorizer(tokenizer=word_tokenize)
 tokens_list_j = [','.join(tkn) for tkn in tokens_list]
 t_feat = (tvec.fit_transform(tokens_list_j))
+# tvec.fit()
 
-print(t_feat.shape)
-print(tvec.vocabulary_)
-print(tvec.idf_)
+# tvec.transform(pos)
+# tvec.transform(negs)
+
+# tokens_list_j = [''.join(tkn) for tkn in tokens_list]
+# t_feat = (tvec.fit_transform(clean_text))
+# X = tvec.fit_transform(clean_text).toarray()
+#
+# print(t_feat.shape)
+# print(tvec.vocabulary_)
+# print(tvec.get_feature_names())
+
+print(X)
 
 # print(tvec.get_feature_names())
 # print(t_feat[:, :5].todense())
