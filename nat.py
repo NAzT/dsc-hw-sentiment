@@ -28,50 +28,51 @@ import string
 
 def clean_msg(msg):
     # ลบ text ที่อยู่ในวงเล็บ <> ทั้งหมด
-    msg = re.sub(r'<.*?>','', msg)
-    
-    # ลบ hashtag
-    msg = re.sub(r'#','',msg)
-    msg = msg.replace('ชิมช็อปใช้เฟส', '')    
+    msg = re.sub(r'<.*?>', '', msg)
 
-    
+    # ลบ hashtag
+    msg = re.sub(r'#', '', msg)
+    msg = msg.replace('ชิมช็อปใช้เฟส', '')
+
     # ลบ เครื่องหมายคำพูด (punctuation)
     for c in string.punctuation:
-        msg = re.sub(r'\{}'.format(c),'',msg)
-    
+        msg = re.sub(r'\{}'.format(c), '', msg)
+
     # ลบ separator เช่น \n \t
     msg = ' '.join(msg.split())
-    
+
     return msg
 
+
 def split_word(text):
-    tokens = word_tokenize(text,engine='newmm')
-    
+    tokens = word_tokenize(text, engine='newmm')
+
     # Remove stop words ภาษาไทย และภาษาอังกฤษ
     tokens = [i for i in tokens if not i in th_stop and not i in en_stop]
-    
+
     # หารากศัพท์ภาษาไทย และภาษาอังกฤษ
     # English
     tokens = [p_stemmer.stem(i) for i in tokens]
-    
+
     # Thai
-    tokens_temp=[]
+    tokens_temp = []
     for i in tokens:
         w_syn = wordnet.synsets(i)
-        if (len(w_syn)>0) and (len(w_syn[0].lemma_names('tha'))>0):
+        if (len(w_syn) > 0) and (len(w_syn[0].lemma_names('tha')) > 0):
             tokens_temp.append(w_syn[0].lemma_names('tha')[0])
         else:
             tokens_temp.append(i)
-    
+
     tokens = tokens_temp
-    
+
     # ลบตัวเลข
     tokens = [i for i in tokens if not i.isnumeric()]
-    
+
     # ลบช่องว่าง
     tokens = [i for i in tokens if not ' ' in i]
 
     return tokens
+
 
 texts = []
 labels = []
@@ -91,7 +92,6 @@ clean_text = [clean_msg(str(txt)) for txt in texts]
 for line in clean_text:
     data.append(split_word(str(line)))
 tokens_list = data
-
 
 print(data[0])
 print(len(data))
