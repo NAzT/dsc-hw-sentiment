@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from itertools import chain
 import re
 import pandas as pd
 from pathlib import Path
@@ -77,7 +78,7 @@ def split_word(text):
 texts = []
 labels = []
 
-with open("38807051.txt") as f:
+with open("35213250.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         texts.append(line.strip())
 
@@ -93,5 +94,71 @@ for line in clean_text:
     data.append(split_word(str(line)))
 tokens_list = data
 
-print(data[0])
-print(len(data))
+print(tokens_list)
+# print(data[1])
+# print(len(data))
+
+neg = []
+pos = []
+with open("neg.txt") as f:
+    negs = [line.strip() for line in f.readlines()]
+
+with open("pos.txt") as f:
+    pos = [line.strip() for line in f.readlines()]
+
+# print(negs)
+# print(pos)
+
+pos1 = ['pos'] * len(pos)
+neg1 = ['neg'] * len(negs)
+training_data = list(zip(pos, pos1)) + list(zip(negs, neg1))
+
+# print('before training')
+# vocabulary = set(chain(*[word_tokenize(i[0]) for i in training_data]))
+# print('before training')
+# feature_set = [({i: (i in split_word(sentence)) for i in vocabulary}, tag) for sentence, tag in
+#                training_data]
+# print('before training')
+# print("feature_set", feature_set)
+from nltk import NaiveBayesClassifier as nbc
+#
+# print('start training')
+# classifier = nbc.train(feature_set)
+# print("done set")
+# while True:
+#     test_sentence = input('\nข้อความ : ')
+#     featurized_test_sentence = {i: (i in word_tokenize(test_sentence.lower())) for i in vocabulary}
+#     print("test_sent:", test_sentence)
+#     print("tag:", classifier.classify(featurized_test_sentence))  # ใช้โมเดลที่ train ประมวลผล
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# from pythainlp.corpus import thai_stopwords
+# th_stop = tuple(thai_stopwords())
+
+# from pythainlp.ulmfit import process_thai
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# tvec = TfidfVectorizer(analyzer=lambda x: x.split(','), )
+
+tvec = TfidfVectorizer(tokenizer=word_tokenize)
+tokens_list_j = [','.join(tkn) for tkn in tokens_list]
+t_feat = (tvec.fit_transform(tokens_list_j))
+
+print(t_feat.shape)
+print(tvec.vocabulary_)
+print(tvec.idf_)
+
+# print(tvec.get_feature_names())
+# print(t_feat[:, :5].todense())
+#
+from sklearn.cluster import KMeans
+
+# n_clusters = 4
+# #
+# # kmeans = KMeans(n_clusters=n_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
+# # pred_y = kmeans.fit_predict(t_feat)
+# # print(t_feat)
+# # tvec.fit()
+# tfidfconverter = TfidfVectorizer(max_features=2000, min_df=5, max_df=0.7, stop_words=th_stop)
+# X = tfidfconverter.fit_transform(texts).toarray()
