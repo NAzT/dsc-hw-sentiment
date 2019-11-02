@@ -82,12 +82,6 @@ with open("35213250.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         texts.append(line.strip())
 
-# print(texts[0])
-# test_df = pd.DataFrame({ "category": "neu", "texts": texts })
-# del texts # del labels
-# test_df.to_csv("_test.csv", index=False)
-# test_df.shape
-
 data = []
 clean_text = [clean_msg(str(txt)) for txt in texts]
 for line in clean_text:
@@ -95,8 +89,6 @@ for line in clean_text:
 tokens_list = data
 
 print(tokens_list)
-# print(data[1])
-# print(len(data))
 
 neg = []
 pos = []
@@ -157,4 +149,11 @@ input = "น่าทึ่งเผื่อธรรมชาติ"
 o = tvec.transform([input])
 ooo = text_classifier.predict(o)
 
-print(ooo)
+with open("35213250.txt", mode='r', encoding='utf-8-sig') as f:
+    for line in f:
+        t = line.strip()
+        o = tvec.transform([t])
+        ooo = text_classifier.predict(o)
+        print(t)
+        print(ooo)
+        print("=========================")
