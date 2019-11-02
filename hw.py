@@ -126,31 +126,8 @@ for i in training_data:
     lbs.append(i[1])
 
 print(training_data)
-# print(training_data)
-# print('before training')
-# vocabulary = set(chain(*[word_tokenize(i[0]) for i in training_data]))
-# print('before training')
-# feature_set = [({i: (i in split_word(sentence)) for i in vocabulary}, tag) for sentence, tag in
-#                training_data]
-# print('before training')
-# print("feature_set", feature_set)
-# from nltk import NaiveBayesClassifier as nbc
-#
-# print('start training')
-# classifier = nbc.train(feature_set)
-# print("done set")
-# while True:
-#     test_sentence = input('\nข้อความ : ')
-#     featurized_test_sentence = {i: (i in word_tokenize(test_sentence.lower())) for i in vocabulary}
-#     print("test_sent:", test_sentence)
-#     print("tag:", classifier.classify(featurized_test_sentence))  # ใช้โมเดลที่ train ประมวลผล
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-# from pythainlp.corpus import thai_stopwords
-# th_stop = tuple(thai_stopwords())
-
-# from pythainlp.ulmfit import process_thai
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # tvec = TfidfVectorizer(analyzer=lambda x: x.split(','), )
@@ -161,13 +138,8 @@ X = tvec.fit_transform(ds)
 y = lbs
 print(X.shape)
 print(tvec.get_feature_names())
-# y = numpy.asarray(all_labels)
-
-# print('len1', len(all_data))
-# print('len2', len(all_labels))
 
 print('X.shape', X.shape)
-# print('y.shape', y.shape)
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
@@ -177,44 +149,8 @@ from sklearn.ensemble import RandomForestClassifier
 text_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
 text_classifier.fit(X_train, y_train)
 
-# predictions = text_classifier.predict(X_test)
-# print(predictions)
-# print(X_test)
-# from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-#
-# print(confusion_matrix(y_test, predictions))
-# print(classification_report(y_test, predictions))
-# print(accuracy_score(y_test, predictions))
-# print(X_test)
 input = "ผิดหวังด้วยคนค่ะ จะเดินออกจากเลนดีๆไม่ได้เลย ต้องเดินถอยหลังคอยโบกมือบ๊ายบาย ไหนจะตะโกนตามออกมาอีก ตั้งใจมาจับกี่ใบไม่เคยตามนั้นเลย เปลืองบัตรเพิ่มตลอด "
 o = tvec.transform([input])
 print(o)
 ooo = text_classifier.predict(tvec.transform([input]))
 print(ooo)
-
-# tvec.transform(pos)
-# tvec.transform(negs)
-
-# tokens_list_j = [''.join(tkn) for tkn in tokens_list]
-# t_feat = (tvec.fit_transform(clean_text))
-# X = tvec.fit_transform(clean_text).toarray()
-#
-# print(t_feat.shape)
-# print(tvec.vocabulary_)
-# print(tvec.get_feature_names())
-
-# print(X)
-
-# print(tvec.get_feature_names())
-# print(t_feat[:, :5].todense())
-#
-# from sklearn.cluster import KMeans
-
-# n_clusters = 4
-# #
-# # kmeans = KMeans(n_clusters=n_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
-# # pred_y = kmeans.fit_predict(t_feat)
-# # print(t_feat)
-# # tvec.fit()
-# tfidfconverter = TfidfVectorizer(max_features=2000, min_df=5, max_df=0.7, stop_words=th_stop)
-# X = tfidfconverter.fit_transform(texts).toarray()
