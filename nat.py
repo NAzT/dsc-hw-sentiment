@@ -108,12 +108,25 @@ with open("pos.txt") as f:
 
 # print(negs)
 # print(pos)
+import numpy
 
 pos1 = ['pos'] * len(pos)
 neg1 = ['neg'] * len(negs)
+
 training_data = list(zip(pos, pos1)) + list(zip(negs, neg1))
+# for
+# print(training_data.shape)
+
+
+ds = []
+lbs = []
+
+for i in training_data:
+    ds.append(i[0])
+    lbs.append(i[1])
 
 print(training_data)
+# print(training_data)
 # print('before training')
 # vocabulary = set(chain(*[word_tokenize(i[0]) for i in training_data]))
 # print('before training')
@@ -143,9 +156,41 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 # tvec = TfidfVectorizer(analyzer=lambda x: x.split(','), )
 
 tvec = TfidfVectorizer(tokenizer=word_tokenize)
-tokens_list_j = [','.join(tkn) for tkn in tokens_list]
-t_feat = (tvec.fit_transform(tokens_list_j))
-# tvec.fit()
+# tokens_list_j = [','.join(tkn) for tkn in tokens_list]
+X = tvec.fit_transform(ds)
+y = lbs
+print(X.shape)
+print(tvec.get_feature_names())
+# y = numpy.asarray(all_labels)
+
+# print('len1', len(all_data))
+# print('len2', len(all_labels))
+
+print('X.shape', X.shape)
+# print('y.shape', y.shape)
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+from sklearn.ensemble import RandomForestClassifier
+
+text_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
+text_classifier.fit(X_train, y_train)
+
+# predictions = text_classifier.predict(X_test)
+# print(predictions)
+# print(X_test)
+# from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+#
+# print(confusion_matrix(y_test, predictions))
+# print(classification_report(y_test, predictions))
+# print(accuracy_score(y_test, predictions))
+# print(X_test)
+input = "ผิดหวังด้วยคนค่ะ จะเดินออกจากเลนดีๆไม่ได้เลย ต้องเดินถอยหลังคอยโบกมือบ๊ายบาย ไหนจะตะโกนตามออกมาอีก ตั้งใจมาจับกี่ใบไม่เคยตามนั้นเลย เปลืองบัตรเพิ่มตลอด "
+o = tvec.transform([input])
+print(o)
+ooo = text_classifier.predict(tvec.transform([input]))
+print(ooo)
 
 # tvec.transform(pos)
 # tvec.transform(negs)
@@ -158,12 +203,12 @@ t_feat = (tvec.fit_transform(tokens_list_j))
 # print(tvec.vocabulary_)
 # print(tvec.get_feature_names())
 
-print(X)
+# print(X)
 
 # print(tvec.get_feature_names())
 # print(t_feat[:, :5].todense())
 #
-from sklearn.cluster import KMeans
+# from sklearn.cluster import KMeans
 
 # n_clusters = 4
 # #
