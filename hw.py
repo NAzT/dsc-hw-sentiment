@@ -100,11 +100,15 @@ print(tokens_list)
 
 neg = []
 pos = []
-with open("neg.txt") as f:
+neu = []
+with open("neg_all.txt") as f:
     negs = [line.strip() for line in f.readlines()]
 
-with open("pos.txt") as f:
+with open("pos_all.txt") as f:
     pos = [line.strip() for line in f.readlines()]
+
+with open("neutral.txt") as f:
+    neu = [line.strip() for line in f.readlines()]
 
 # print(negs)
 # print(pos)
@@ -112,8 +116,9 @@ import numpy
 
 pos1 = ['pos'] * len(pos)
 neg1 = ['neg'] * len(negs)
+neu1 = ['neu'] * len(neu)
 
-training_data = list(zip(pos, pos1)) + list(zip(negs, neg1))
+training_data = list(zip(pos, pos1)) + list(zip(negs, neg1)) + list(zip(neu, neu1))
 # for
 # print(training_data.shape)
 
@@ -151,6 +156,7 @@ text_classifier.fit(X_train, y_train)
 
 input = "ผิดหวังด้วยคนค่ะ จะเดินออกจากเลนดีๆไม่ได้เลย ต้องเดินถอยหลังคอยโบกมือบ๊ายบาย ไหนจะตะโกนตามออกมาอีก ตั้งใจมาจับกี่ใบไม่เคยตามนั้นเลย เปลืองบัตรเพิ่มตลอด "
 o = tvec.transform([input])
-print(o)
-ooo = text_classifier.predict(tvec.transform([input]))
+ooo = text_classifier.predict(o)
+
+# print(o)
 print(ooo)
