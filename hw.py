@@ -121,7 +121,7 @@ neu1 = ['neu'] * len(neu)
 training_data = list(zip(pos, pos1)) + list(zip(negs, neg1)) + list(zip(neu, neu1))
 # for
 # print(training_data.shape)
-
+print(neu)
 
 ds = []
 lbs = []
@@ -130,9 +130,8 @@ for i in training_data:
     ds.append(i[0])
     lbs.append(i[1])
 
-print(training_data)
+# print(training_data)
 
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # tvec = TfidfVectorizer(analyzer=lambda x: x.split(','), )
@@ -141,8 +140,8 @@ tvec = TfidfVectorizer(tokenizer=word_tokenize)
 # tokens_list_j = [','.join(tkn) for tkn in tokens_list]
 X = tvec.fit_transform(ds)
 y = lbs
-print(X.shape)
-print(tvec.get_feature_names())
+# print(X.shape)
+# print(tvec.get_feature_names())
 
 print('X.shape', X.shape)
 from sklearn.model_selection import train_test_split
@@ -154,9 +153,8 @@ from sklearn.ensemble import RandomForestClassifier
 text_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
 text_classifier.fit(X_train, y_train)
 
-input = "ผิดหวังด้วยคนค่ะ จะเดินออกจากเลนดีๆไม่ได้เลย ต้องเดินถอยหลังคอยโบกมือบ๊ายบาย ไหนจะตะโกนตามออกมาอีก ตั้งใจมาจับกี่ใบไม่เคยตามนั้นเลย เปลืองบัตรเพิ่มตลอด "
+input = "น่าทึ่งเผื่อธรรมชาติ"
 o = tvec.transform([input])
 ooo = text_classifier.predict(o)
 
-# print(o)
 print(ooo)
