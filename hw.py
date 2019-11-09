@@ -111,8 +111,6 @@ with open("pos_all.txt") as f:
 with open("neutral.txt") as f:
     neu = [line.strip() for line in f.readlines()]
 
-# print(negs)
-# print(pos)
 import numpy
 
 pos1 = ['pos'] * len(pos)
@@ -120,9 +118,6 @@ neg1 = ['neg'] * len(negs)
 neu1 = ['neu'] * len(neu)
 
 training_data = list(zip(pos, pos1)) + list(zip(negs, neg1)) + list(zip(neu, neu1))
-# for
-# print(training_data.shape)
-print(neu)
 
 ds = []
 lbs = []
@@ -134,12 +129,14 @@ for i in training_data:
 # print(training_data)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
 # tvec = TfidfVectorizer(analyzer=lambda x: x.split(','), )
 
 
-tvec = TfidfVectorizer(tokenizer=mytokenizer)
 # tokens_list_j = [','.join(tkn) for tkn in tokens_list]
+
+tvec = CountVectorizer(tokenizer=mytokenizer)
 X = tvec.fit_transform(ds)
 y = lbs
 print(X.shape)
@@ -206,10 +203,9 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 clfs = []
 clfs.append(LogisticRegression())
 clfs.append(SVC())
-clfs.append(KNeighborsClassifier(n_neighbors=3))
+clfs.append(KNeighborsClassifier(n_neighbors=5))
 clfs.append(DecisionTreeClassifier())
 clfs.append(RandomForestClassifier())
-clfs.append(GradientBoostingClassifier())
 clfs.append(GradientBoostingClassifier())
 clfs.append(MLPClassifier(alpha=1, max_iter=1000))
 clfs.append(AdaBoostClassifier())
@@ -236,13 +232,14 @@ for classifier in clfs:
 # listword = ['แมว', "ดี"]
 # data_dict = create_custom_dict_trie(listword)
 # print(data_dict)
-with open("38807051.txt", mode='r', encoding='utf-8-sig') as f:
+with open("39285983.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         t = line.strip()
         print(t)
         print(mytokenizer(t))
         # print(deepcut.tokenize(t))
         o = tvec.transform([t])
+        results = []
         for m in models:
-            print(m, m.predict(o))
+            print(m.predict(o), str(m).split("(")[0])
         print("=========================")
