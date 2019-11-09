@@ -211,6 +211,7 @@ with open("38807051.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         t = line.strip()
         print(t)
+        print(deepcut.tokenize(t))
         o = tvec.transform([t])
         p1 = text_classifier.predict(o)
         p2 = text_classifier2.predict(o)
