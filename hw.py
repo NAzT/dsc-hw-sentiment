@@ -25,6 +25,7 @@ import pandas as pd
 
 nltk.download('words')
 th_stop = tuple(thai_stopwords())
+print(th_stop)
 en_stop = tuple(get_stop_words('en'))
 p_stemmer = PorterStemmer()
 
@@ -42,7 +43,6 @@ def clean_msg(msg):
 
     # ลบ hashtag
     msg = re.sub(r'#', '', msg)
-    msg = msg.replace('ชิมช็อปใช้เฟส', '')
 
     # ลบ เครื่องหมายคำพูด (punctuation)
     for c in string.punctuation:
@@ -56,24 +56,24 @@ def clean_msg(msg):
 
 def split_word(text):
     tokens = mytokenizer(text)
-
+    #
     # Remove stop words ภาษาไทย และภาษาอังกฤษ
-    tokens = [i for i in tokens if not i in th_stop and not i in en_stop]
-
-    # หารากศัพท์ภาษาไทย และภาษาอังกฤษ
-    # English
-    tokens = [p_stemmer.stem(i) for i in tokens]
-
-    # Thai
-    tokens_temp = []
-    for i in tokens:
-        w_syn = wordnet.synsets(i)
-        if (len(w_syn) > 0) and (len(w_syn[0].lemma_names('tha')) > 0):
-            tokens_temp.append(w_syn[0].lemma_names('tha')[0])
-        else:
-            tokens_temp.append(i)
-
-    tokens = tokens_temp
+    # tokens = [i for i in tokens if not i in th_stop and not i in en_stop]
+    # #
+    # # หารากศัพท์ภาษาไทย และภาษาอังกฤษ
+    # # English
+    # tokens = [p_stemmer.stem(i) for i in tokens]
+    #
+    # # Thai
+    # tokens_temp = []
+    # for i in tokens:
+    #     w_syn = wordnet.synsets(i)
+    #     if (len(w_syn) > 0) and (len(w_syn[0].lemma_names('tha')) > 0):
+    #         tokens_temp.append(w_syn[0].lemma_names('tha')[0])
+    #     else:
+    #         tokens_temp.append(i)
+    #
+    # tokens = tokens_temp
 
     # ลบตัวเลข
     tokens = [i for i in tokens if not i.isnumeric()]
@@ -91,13 +91,13 @@ with open("35213250.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         texts.append(line.strip())
 
-data = []
-clean_text = [clean_msg(str(txt)) for txt in texts]
-for line in clean_text:
-    data.append(split_word(str(line)))
-tokens_list = data
-
-print(tokens_list)
+# data = []
+# clean_text = [clean_msg(str(txt)) for txt in texts]
+# for line in clean_text:
+#     data.append(split_word(str(line)))
+# tokens_list = data
+#
+# print(tokens_list)
 
 negs = []
 pos = []
@@ -124,6 +124,15 @@ lbs = []
 
 for i in training_data:
     ds.append(i[0])
+    o = ''
+    # if i[1] == "pos":
+    #     o = 0
+    # if i[1] == "neg":
+    #     o = 1
+    # if i[1] == "neu":
+    #     o = 2
+
+    # lbs.append(o)
     lbs.append(i[1])
 
 # print(training_data)
@@ -136,7 +145,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 # tokens_list_j = [','.join(tkn) for tkn in tokens_list]
 
-tvec = CountVectorizer(tokenizer=mytokenizer)
+tvec = CountVectorizer(tokenizer=split_word)
 X = tvec.fit_transform(ds)
 y = lbs
 print(X.shape)
@@ -157,22 +166,22 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 from sklearn.ensemble import RandomForestClassifier
 
-text_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
-text_classifier.fit(X_train, y_train)
+# text_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
+# text_classifier.fit(X_train, y_train)
+#
+# from sklearn.svm import SVC
+#
+# text_classifier2 = SVC(gamma=10, C=3)
+# text_classifier2.fit(X_train, y_train)
+#
+# input = "ความชั่วช้าซ้ำซ้อน"
+# o = tvec.transform([input])
+# ooo = text_classifier.predict(o)
+#
+# score = text_classifier.score(X_test, y_test)
+# print('accuracy : ', score)
 
-from sklearn.svm import SVC
-
-text_classifier2 = SVC(gamma=10, C=3)
-text_classifier2.fit(X_train, y_train)
-
-input = "ความชั่วช้าซ้ำซ้อน"
-o = tvec.transform([input])
-ooo = text_classifier.predict(o)
-
-score = text_classifier.score(X_test, y_test)
-print('accuracy : ', score)
-
-print(ooo)
+# print(ooo)
 
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -202,13 +211,13 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 clfs = []
 clfs.append(LogisticRegression())
-clfs.append(SVC())
-clfs.append(KNeighborsClassifier(n_neighbors=5))
 clfs.append(DecisionTreeClassifier())
 clfs.append(RandomForestClassifier())
-clfs.append(GradientBoostingClassifier())
 clfs.append(MLPClassifier(alpha=1, max_iter=1000))
-clfs.append(AdaBoostClassifier())
+# clfs.append(AdaBoostClassifier())
+# clfs.append(GradientBoostingClassifier())
+# clfs.append(SVC())
+# clfs.append(KNeighborsClassifier(n_neighbors=5))
 pipeline = Pipeline([
     ('clf', LogisticRegression())  # step2 - classifier
 ])
@@ -236,10 +245,11 @@ with open("39285983.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         t = line.strip()
         print(t)
-        print(mytokenizer(t))
+        print(split_word(t))
         # print(deepcut.tokenize(t))
         o = tvec.transform([t])
         results = []
         for m in models:
+            # print(m.predict(o))
             print(m.predict(o), str(m).split("(")[0])
         print("=========================")
