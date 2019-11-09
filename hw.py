@@ -90,7 +90,7 @@ tokens_list = data
 
 print(tokens_list)
 
-neg = []
+negs = []
 pos = []
 neu = []
 with open("neg_all.txt") as f:
@@ -132,7 +132,9 @@ tvec = TfidfVectorizer(tokenizer=word_tokenize)
 # tokens_list_j = [','.join(tkn) for tkn in tokens_list]
 X = tvec.fit_transform(ds)
 y = lbs
-# print(X.shape)
+print(X.shape)
+print(X.toarray())
+
 # print(tvec.get_feature_names())
 
 print('X.shape', X.shape)
@@ -145,15 +147,26 @@ from sklearn.ensemble import RandomForestClassifier
 text_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
 text_classifier.fit(X_train, y_train)
 
-input = "น่าทึ่งเผื่อธรรมชาติ"
+from sklearn.svm import SVC
+
+text_classifier2 = SVC(gamma=10, C=3)
+text_classifier2.fit(X_train, y_train)
+
+input = "ความชั่วช้าซ้ำซ้อน"
 o = tvec.transform([input])
 ooo = text_classifier.predict(o)
 
-with open("35213250.txt", mode='r', encoding='utf-8-sig') as f:
+score = text_classifier.score(X_test, y_test)
+print('accuracy : ', score)
+
+print(ooo)
+
+with open("38807051.txt", mode='r', encoding='utf-8-sig') as f:
     for line in f:
         t = line.strip()
-        o = tvec.transform([t])
-        ooo = text_classifier.predict(o)
         print(t)
-        print(ooo)
+        o = tvec.transform([t])
+        p1 = text_classifier.predict(o)
+        p2 = text_classifier2.predict(o)
+        print(p1, p2)
         print("=========================")
