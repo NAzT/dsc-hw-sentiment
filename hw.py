@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 
+from deepcut import DeepcutTokenizer
+import deepcut
 from itertools import chain
 import re
 import pandas as pd
 from pathlib import Path
 import string
+from pprint import pprint
 
-from pythainlp.tokenize import word_tokenize
+# from pythainlp.tokenize import word_tokenize
 from pythainlp import word_tokenize
 from pythainlp.corpus import wordnet
 from pythainlp.corpus import thai_stopwords
 
+tokenizer = DeepcutTokenizer(ngram_range=(1, 1),
+                             max_df=1.0, min_df=0.0)
 import nltk
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import words
@@ -46,7 +51,8 @@ def clean_msg(msg):
 
 
 def split_word(text):
-    tokens = word_tokenize(text, engine='newmm')
+    # tokens = word_tokenize(text, engine='deepcut')
+    tokens = deepcut.tokenize(text)
 
     # Remove stop words ภาษาไทย และภาษาอังกฤษ
     tokens = [i for i in tokens if not i in th_stop and not i in en_stop]
@@ -128,7 +134,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # tvec = TfidfVectorizer(analyzer=lambda x: x.split(','), )
 
-tvec = TfidfVectorizer(tokenizer=word_tokenize)
+tvec = TfidfVectorizer(tokenizer=deepcut.tokenize)
 # tokens_list_j = [','.join(tkn) for tkn in tokens_list]
 X = tvec.fit_transform(ds)
 y = lbs
@@ -136,6 +142,46 @@ print(X.shape)
 print(X.toarray())
 
 # print(tvec.get_feature_names())
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.linear_model import SGDClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from time import time
+
+# pipeline = Pipeline([
+#     ('vect', CountVectorizer()),
+#     ('tfidf', TfidfTransformer()),
+#     ('clf', SGDClassifier(tol=1e-3)),
+# ])
+#
+# parameters = {
+#     'vect__max_df': (0.5, 0.75, 1.0),
+#     # 'vect__max_features': (None, 5000, 10000, 50000),
+#     'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
+#     # 'tfidf__use_idf': (True, False),
+#     # 'tfidf__norm': ('l1', 'l2'),
+#     'clf__max_iter': (20,),
+#     'clf__alpha': (0.00001, 0.000001),
+#     'clf__penalty': ('l2', 'elasticnet'),
+#     # 'clf__max_iter': (10, 50, 80),
+# }
+#
+# grid_search = GridSearchCV(pipeline, parameters, cv=5,
+#                            n_jobs=-1, verbose=1)
+#
+# print("Performing grid search...")
+# print("pipeline:", [name for name, _ in pipeline.steps])
+# print("parameters:")
+# pprint(parameters)
+# t0 = time()
+# grid_search.fit(X, y)
+# print("done in %0.3fs" % (time() - t0))
+# print()
+#
+# print("Best score: %0.3f" % grid_search.best_score_)
+# print("Best parameters set:")
+# best_parameters = grid_search.best_estimator_.get_params()
 
 print('X.shape', X.shape)
 from sklearn.model_selection import train_test_split
@@ -170,3 +216,88 @@ with open("38807051.txt", mode='r', encoding='utf-8-sig') as f:
         p2 = text_classifier2.predict(o)
         print(p1, p2)
         print("=========================")
+
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import TruncatedSVD
+from sklearn.ensemble import RandomForestClassifier
+# from xgboost import XGBClassifier
+
+from sklearn.base import BaseEstimator, TransformerMixin
+
+
+class TextSelector(BaseEstimator, TransformerMixin):
+    def __init__(self, field):
+        self.field = field
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X[self.field]
+
+
+class NumberSelector(BaseEstimator, TransformerMixin):
+    def __init__(self, field):
+        self.field = field
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X[[self.field]]
+
+
+#
+# classifier = Pipeline([
+#     ('clf', [RandomForestClassifier()]),
+# ])
+#
+# classifier.fit(X_train, y_train)
+# preds = classifier.predict(X_test)
+#
+# print(preds)
+
+
+# import warnings filter
+from warnings import simplefilter
+
+# ignore all future warnings
+simplefilter(action='ignore', category=FutureWarning)
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+
+clfs = []
+clfs.append(LogisticRegression())
+clfs.append(SVC())
+clfs.append(SVC())
+clfs.append(KNeighborsClassifier(n_neighbors=3))
+clfs.append(DecisionTreeClassifier())
+clfs.append(RandomForestClassifier())
+clfs.append(RandomForestClassifier())
+clfs.append(GradientBoostingClassifier())
+clfs.append(GradientBoostingClassifier())
+pipeline = Pipeline([
+    ('clf', LogisticRegression())  # step2 - classifier
+])
+pipeline.steps
+from sklearn.model_selection import cross_validate
+
+scores = cross_validate(pipeline, X_train, y_train)
+print(scores)
+for classifier in clfs:
+    pipeline.set_params(clf=classifier)
+    scores = cross_validate(pipeline, X_train, y_train)
+    print('---------------------------------')
+    print(str(classifier))
+    print('-----------------------------------')
+    for key, values in scores.items():
+        print(key, ' mean ', values.mean())
+        print(key, ' std ', values.std())
